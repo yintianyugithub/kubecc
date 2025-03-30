@@ -1,13 +1,11 @@
 package svc
 
 import (
-	"greet/api-greet/internal/config"
-	"greet/service/add/adder"
+	"greet/api/internal/config"
 )
 
 type ServiceContext struct {
 	Config config.Config
-	RpcAdd adder.Adder
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {

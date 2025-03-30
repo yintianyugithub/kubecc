@@ -3,6 +3,15 @@
 
 package types
 
+type AddReq struct {
+	Name string `path:"name,options=[you,me]"` // parameters are auto validated
+}
+
+type AddRsp struct {
+	Message  string `json : "message"` // response is auto validated
+	Message1 string `json: "message1"` // response is auto validated
+}
+
 type Request struct {
 	Name string `path:"name,options=[you,me]"` // parameters are auto validated
 }

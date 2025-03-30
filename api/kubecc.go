@@ -4,15 +4,15 @@ import (
 	"flag"
 	"fmt"
 
-	"greet/api-greet/internal/config"
-	"greet/api-greet/internal/handler"
-	"greet/api-greet/internal/svc"
+	"greet/api/internal/config"
+	"greet/api/internal/handler"
+	"greet/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/greet-api.yaml", "the config file")
+var configFile = flag.String("f", "etc/kubecc-api.yaml", "the config file")
 
 func main() {
 	flag.Parse()
