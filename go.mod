@@ -4,11 +4,13 @@ go 1.23.4
 
 require (
 	github.com/zeromicro/go-zero v1.8.1
+	go.uber.org/ratelimit v0.3.1
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.36.5
 )
 
 require (
+	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

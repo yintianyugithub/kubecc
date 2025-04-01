@@ -1,0 +1,4 @@
+### GET request to example server
+GET https://business-api.tiktok.com/open_api/v1.3/ad/get/
+
+###
