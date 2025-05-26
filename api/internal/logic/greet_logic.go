@@ -24,7 +24,9 @@ func NewGreetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GreetLogic 
 }
 
 func (l *GreetLogic) Greet(req *types.Request) (resp *types.Response, err error) {
-	// todo: add your logic here and delete this line
 
-	return
+	return &types.Response{
+		Message:  "111",
+		Message1: l.svcCtx.Config.AttrSecret,
+	}, nil
 }
