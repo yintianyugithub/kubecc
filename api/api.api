@@ -2,7 +2,6 @@ syntax = "v1"
 
 import (
 	"apis/greet.api"
-	"apis/add.api"
 )
 
 info (
