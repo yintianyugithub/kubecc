@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"greet/core/xerr"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
@@ -59,6 +60,22 @@ func Response(ctx context.Context, w http.ResponseWriter, r *http.Request, resp 
 		RequestId: trace.TraceIDFromContext(ctx),
 		Code:      code,
 		Msg:       msg,
-		Data:      resp,
+		Data:      normalizeNil(resp),
 	})
+}
+
+func normalizeNil(i interface{}) interface{} {
+	if i == nil {
+		return nil
+	}
+	v := reflect.ValueOf(i)
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Interface, reflect.Func:
+		if v.IsNil() {
+			return nil
+		}
+	default:
+		return i
+	}
+	return i
 }

@@ -26,10 +26,6 @@ func NewGreetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GreetLogic 
 
 func (l *GreetLogic) Greet(req *types.Request) (resp *types.Response, err error) {
 
-	resp = &types.Response{
-		Message:  "1",
-		Message1: "2",
-	}
 	err = xerr.Error(xerr.ErrCodeParamsInvalid, "参数错误")
 
 	return
