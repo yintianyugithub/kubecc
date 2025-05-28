@@ -5,7 +5,7 @@ import (
 )
 
 type ServiceContext struct {
-	Config {{.config}}
+	Config *{{.config}}
 	{{.middleware}}
 }
 

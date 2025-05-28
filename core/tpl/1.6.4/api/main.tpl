@@ -7,13 +7,28 @@ import (
 	{{.importPackages}}
 )
 
-var configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
+var (
+    configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
+    nc = nacos.PointParam{
+        NamespaceId: "",
+        ServerName:  "",
+        GroupName:   "",
+        DataId:      "",
+    }
+)
 
 func main() {
 	flag.Parse()
 
-	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	c := &config.Config{}
+	conf.MustLoad(*configFile, c)
+
+    nc.Register()
+	if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
+		panic(err)
+		return
+	}
+	go c.HotLoadCnf(nc.DataId, nc.GroupName)
 
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()

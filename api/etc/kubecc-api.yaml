@@ -1,3 +1,7 @@
 Name: kubecc-api
 Host: 0.0.0.0
 Port: 8888
+Nacos:
+  Hosts: ["127.0.0.1:8848","127.0.0.1:8848"]
+  Key: kubecc-api.api
+  Scheme: http

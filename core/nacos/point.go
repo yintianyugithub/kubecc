@@ -93,7 +93,7 @@ func (p PointParam) Register() {
 		panic(err)
 	}
 
-	cs.nc = NewConfig()
+	cs.nc = newConfig()
 }
 
 // GetCnf 从Nacos获取配置
@@ -110,31 +110,9 @@ func (p PointParam) GetCnf() string {
 }
 
 // HotLoadCnf todo 热加载配置 data已更新，但服务配置未更新
-func (p PointParam) HotLoadCnf() {
-	defer func() {
-		if r := recover(); r != nil {
-			logx.Errorf("Recovered from hot load config panic: %v", r)
-		}
-	}()
-	err := cs.nc.ListenConfig(vo.ConfigParam{
-		DataId: p.DataId,
-		Group:  p.GroupName,
-		OnChange: func(namespace, group, dataId, data string) {
-			logx.Info(namespace, group, dataId, data)
-			//err := conf.LoadFromYamlBytes([]byte(data), &c)
-			//if err != nil {
-			//	logx.Errorf("Failed to load config: %v", err)
-			//	return
-			//}
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-}
 
 // newConfig 初始化nacos配置
-func NewConfig() config_client.IConfigClient {
+func newConfig() config_client.IConfigClient {
 	// 创建动态配置客户端
 	cnfClt, err := clients.NewConfigClient(
 		vo.NacosClientParam{
