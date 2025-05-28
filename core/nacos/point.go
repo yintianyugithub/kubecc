@@ -93,7 +93,7 @@ func (p PointParam) Register() {
 		panic(err)
 	}
 
-	cs.nc = newConfig()
+	cs.nc = NewConfig()
 }
 
 // GetCnf 从Nacos获取配置
@@ -121,6 +121,11 @@ func (p PointParam) HotLoadCnf() {
 		Group:  p.GroupName,
 		OnChange: func(namespace, group, dataId, data string) {
 			logx.Info(namespace, group, dataId, data)
+			//err := conf.LoadFromYamlBytes([]byte(data), &c)
+			//if err != nil {
+			//	logx.Errorf("Failed to load config: %v", err)
+			//	return
+			//}
 		},
 	})
 	if err != nil {
@@ -129,7 +134,7 @@ func (p PointParam) HotLoadCnf() {
 }
 
 // newConfig 初始化nacos配置
-func newConfig() config_client.IConfigClient {
+func NewConfig() config_client.IConfigClient {
 	// 创建动态配置客户端
 	cnfClt, err := clients.NewConfigClient(
 		vo.NacosClientParam{
