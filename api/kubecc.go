@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	// todo FIXME: 修改名称（configFile、nc）
 	configFile = flag.String("f", "etc/kubecc-api.yaml", "the config file")
 	nc         = nacos.PointParam{
 		NamespaceId: "",
