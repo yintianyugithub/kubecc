@@ -16,11 +16,10 @@ import (
 var (
 	// todo FIXME: 修改名称（configFile、nc）
 	configFile = flag.String("f", "etc/kubecc-api.yaml", "the config file")
-	nc         = nacos.PointParam{
-		NamespaceId: "",
-		ServerName:  "",
-		GroupName:   "",
-		DataId:      "",
+	nc         = &nacos.PointParam{
+		ServerName: "kubecc-api",
+		GroupName:  "kubecc-api",
+		DataId:     "kubecc-api",
 	}
 )
 
@@ -29,13 +28,16 @@ func main() {
 
 	c := &config.Config{}
 	conf.MustLoad(*configFile, c)
+	nc.NamespaceId = c.Mode
+
 	fmt.Println(c)
+
 	nc.Register()
 	if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
 		panic(err)
 		return
 	}
-	go c.HotLoadCnf(nc.DataId, nc.GroupName)
+	go c.HotLoadCnf(nc)
 
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()

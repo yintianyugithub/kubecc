@@ -16,21 +16,15 @@ type PointParam struct {
 	ServerName  string
 	GroupName   string
 	DataId      string
-}
+	Inc         config_client.IConfigClient
 
-type csConf struct {
-	c  constant.ClientConfig
-	s  []constant.ServerConfig
-	nc config_client.IConfigClient
+	c *constant.ClientConfig
+	s []constant.ServerConfig
 }
-
-var (
-	cs = &csConf{}
-)
 
 // Register 服务注册、发现
-func (p PointParam) Register() {
-	cs.c = constant.ClientConfig{
+func (p *PointParam) Register() {
+	p.c = &constant.ClientConfig{
 		// 如果需要支持多namespace，我们可以创建多个client,它们有不同的NamespaceId。当namespace是public时，此处填空字符串。
 		NamespaceId:         p.NamespaceId,
 		TimeoutMs:           5000,
@@ -40,7 +34,7 @@ func (p PointParam) Register() {
 		LogLevel:            "debug",
 	}
 
-	cs.s = []constant.ServerConfig{
+	p.s = []constant.ServerConfig{
 		{
 			IpAddr:      "127.0.0.1",
 			ContextPath: "/nacos",
@@ -52,8 +46,8 @@ func (p PointParam) Register() {
 	// 创建服务发现客户端
 	namingClient, err := clients.NewNamingClient(
 		vo.NacosClientParam{
-			ClientConfig:  &cs.c,
-			ServerConfigs: cs.s,
+			ClientConfig:  p.c,
+			ServerConfigs: p.s,
 		},
 	)
 
@@ -93,17 +87,22 @@ func (p PointParam) Register() {
 		panic(err)
 	}
 
-	cs.nc = newConfig()
+	p.Inc = p.newConfig()
 }
 
 // GetCnf 从Nacos获取配置
-func (p PointParam) GetCnf() string {
-	ct, err := cs.nc.GetConfig(vo.ConfigParam{
+func (p *PointParam) GetCnf() string {
+	ct, err := p.Inc.GetConfig(vo.ConfigParam{
 		DataId: p.DataId,
 		Group:  p.GroupName,
 	})
+
 	if err != nil {
 		panic(err)
+	}
+
+	if ct == "" {
+		panic(fmt.Errorf("获取配置失败, DataId: %s, Group: %s", p.DataId, p.GroupName))
 	}
 
 	return ct
@@ -112,12 +111,12 @@ func (p PointParam) GetCnf() string {
 // HotLoadCnf todo 热加载配置 data已更新，但服务配置未更新
 
 // newConfig 初始化nacos配置
-func newConfig() config_client.IConfigClient {
+func (p *PointParam) newConfig() config_client.IConfigClient {
 	// 创建动态配置客户端
 	cnfClt, err := clients.NewConfigClient(
 		vo.NacosClientParam{
-			ClientConfig:  &cs.c,
-			ServerConfigs: cs.s,
+			ClientConfig:  p.c,
+			ServerConfigs: p.s,
 		},
 	)
 

@@ -27,6 +27,9 @@ func NewGreetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GreetLogic 
 func (l *GreetLogic) Greet(req *types.Request) (resp *types.Response, err error) {
 
 	err = xerr.Error(xerr.ErrCodeParamsInvalid, "参数错误")
-	resp = &types.Response{}
+	resp = &types.Response{
+		Message:  l.svcCtx.Config.Secret,
+		Message1: "1",
+	}
 	return
 }

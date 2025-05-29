@@ -3,39 +3,50 @@ package main
 import (
 	"flag"
 	"fmt"
+	"greet/core/nacos"
+
+	"greet/api/internal/config"
+	"greet/api/internal/handler"
+	"greet/api/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
 
 	{{.importPackages}}
 )
 
 var (
+    // todo FIXME: 修改名称（configFile、nc）
     configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
-    nc = nacos.PointParam{
-        NamespaceId: "",
-        ServerName:  "",
-        GroupName:   "",
-        DataId:      "",
+    nc = &nacos.PointParam{
+		ServerName:  "{{.serviceName}}",
+		GroupName:   "{{.serviceName}}",
+		DataId:      "{{.serviceName}}",
     }
 )
 
 func main() {
 	flag.Parse()
+    
+    c := &config.Config{}
+    conf.MustLoad(*configFile, c)
+    nc.NamespaceId = c.Mode
 
-	c := &config.Config{}
-	conf.MustLoad(*configFile, c)
+    fmt.Println(c)
 
     nc.Register()
-	if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
-		panic(err)
-		return
-	}
-	go c.HotLoadCnf(nc.DataId, nc.GroupName)
+    if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
+        panic(err)
+        return
+    }
+    go c.HotLoadCnf(nc)
 
-	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
+    server := rest.MustNewServer(c.RestConf)
+    defer server.Stop()
 
-	ctx := svc.NewServiceContext(c)
-	handler.RegisterHandlers(server, ctx)
+    ctx := svc.NewServiceContext(c)
+    handler.RegisterHandlers(server, ctx)
 
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	server.Start()
+    fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+    server.Start()
 }
