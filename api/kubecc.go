@@ -28,22 +28,15 @@ func main() {
 
 	c := &config.Config{}
 	conf.MustLoad(*configFile, c)
-	nc.NamespaceId = c.Mode
-
-	fmt.Println(c)
-
-	nc.Register()
-	if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
-		panic(err)
-		return
-	}
-	go c.HotLoadCnf(nc)
 
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
+
+	c.Register(nc)
+	go c.HotLoadCnf(nc)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
