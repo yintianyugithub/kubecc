@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
@@ -29,13 +28,9 @@ var (
 func main() {
 	flag.Parse()
 
-	nc.Register()
+	c := &config.Config{}
 
-	var c config.Config
-
-	err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), &c)
-
-	logx.Infof("config:%+v err:%+v", c, err)
+	conf.MustLoad(*configFile, c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		add.RegisterAdderServer(grpcServer, server.NewAdderServer(svc.NewServiceContext(c)))

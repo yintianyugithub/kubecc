@@ -1,6 +1,7 @@
 Name: add.rpc
 ListenOn: 0.0.0.0:7080
-#Etcd:
-#  Hosts:
-#  - 127.0.0.1:2379
-#  Key: add.rpc
+Nacos:
+  Hosts: ["127.0.0.1:8848","127.0.0.1:8848"]
+  Key: kubecc-api.api
+  Scheme: http
+Mode: "pro"

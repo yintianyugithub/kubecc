@@ -38,8 +38,6 @@ func (c *Config) HotLoadCnf(nc *nacos.PointParam) {
 
 // Register 服务注册、发现
 func (c *Config) Register(p *nacos.PointParam) {
-	p.NamespaceId = c.Mode
-
 	port, err := strconv.Atoi(strings.Split(c.Nacos.Hosts[0], ":")[1])
 	if err != nil {
 		panic(err)
@@ -48,7 +46,7 @@ func (c *Config) Register(p *nacos.PointParam) {
 
 	p.C = &constant.ClientConfig{
 		// 如果需要支持多namespace，我们可以创建多个client,它们有不同的NamespaceId。当namespace是public时，此处填空字符串。
-		NamespaceId:         p.NamespaceId,
+		NamespaceId:         c.Mode,
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
 		LogDir:              "/tmp/nacos/log",
@@ -79,14 +77,9 @@ func (c *Config) Register(p *nacos.PointParam) {
 
 	// 服务发现-注册
 	_, err = namingClient.RegisterInstance(vo.RegisterInstanceParam{
-		Ip:          ip,
-		Port:        uint64(port),
+		Ip:          c.Host,
+		Port:        uint64(c.Port),
 		ServiceName: p.ServerName,
-		Weight:      10,
-		Enable:      true,
-		Healthy:     true,
-		Ephemeral:   true,
-		Metadata:    map[string]string{"idc": "shanghai"},
 		ClusterName: fmt.Sprintf("cluster-%s", p.GroupName),
 		GroupName:   p.GroupName,
 	})
@@ -97,18 +90,28 @@ func (c *Config) Register(p *nacos.PointParam) {
 
 	// todo fix-me // 服务发现-注销、获取服务信息、获取所有实例列表、获取实例列表、获取一个健康实例(加权轮询)
 	// todo 取消服务监听、获取服务名列表
-	// 服务注册-监听服务变化
+	// 监听服务变化
 	if err := namingClient.Subscribe(&vo.SubscribeParam{
 		ServiceName: p.ServerName,
 		Clusters:    []string{fmt.Sprintf("cluster-%s", p.GroupName)},
 		GroupName:   p.GroupName,
 		SubscribeCallback: func(services []model.Instance, err error) {
-			logx.Infof("服务变化回调: %s, 错误: %+v", util.ToJsonString(services), err)
+			fmt.Println("服务变化回调：", util.ToJsonString(services))
 		},
 	}); err != nil {
 		panic(err)
 	}
 
+	// 获取服务信息
+	svcInfo, err := namingClient.GetService(vo.GetServiceParam{
+		Clusters:    []string{fmt.Sprintf("cluster-%s", p.GroupName)},
+		ServiceName: p.ServerName,
+		GroupName:   p.GroupName,
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(util.ToJsonString(svcInfo))
 	p.Inc = p.NewConfig()
 
 	if err := conf.LoadFromYamlBytes([]byte(p.GetCnf()), c); err != nil {
