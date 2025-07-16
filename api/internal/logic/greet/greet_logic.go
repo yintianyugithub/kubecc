@@ -1,8 +1,7 @@
-package logic
+package greet
 
 import (
 	"context"
-	"greet/core/xerr"
 
 	"greet/api/internal/svc"
 	"greet/api/internal/types"
@@ -25,11 +24,7 @@ func NewGreetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GreetLogic 
 }
 
 func (l *GreetLogic) Greet(req *types.Request) (resp *types.Response, err error) {
+	// todo: add your logic here and delete this line
 
-	err = xerr.Error(xerr.ErrCodeParamsInvalid, "参数错误")
-	resp = &types.Response{
-		Message:  l.svcCtx.Config.Secret,
-		Message1: "1",
-	}
 	return
 }

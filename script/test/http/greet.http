@@ -1,2 +1,2 @@
 ### GET request to example server
-GET http://localhost:8888/greet/from/you
+GET http://localhost:8888/v1/greet/from/you

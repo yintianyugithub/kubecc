@@ -1,10 +1,10 @@
-package handler
+package greet
 
 import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"greet/api/internal/logic"
+	"greet/api/internal/logic/greet"
 	"greet/api/internal/svc"
 	"greet/api/internal/types"
 	"greet/core/xhttp"
@@ -18,7 +18,7 @@ func GreetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := logic.NewGreetLogic(r.Context(), svcCtx)
+		l := greet.NewGreetLogic(r.Context(), svcCtx)
 		resp, err := l.Greet(&req)
 		xhttp.Response(r.Context(), w, r, resp, err)
 	}

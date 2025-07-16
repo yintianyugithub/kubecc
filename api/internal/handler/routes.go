@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	greet "greet/api/internal/handler/greet"
 	"greet/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -11,12 +12,16 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/greet/from/:name",
-				Handler: GreetHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.SvcGvcMiddleware, serverCtx.JwtMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/greet/from/:name",
+					Handler: greet.GreetHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1"),
 	)
 }

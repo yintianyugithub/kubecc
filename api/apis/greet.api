@@ -8,6 +8,12 @@ type (
     }
 )
 
+@server(
+    group: greet
+    prefix: v1
+    middleware: SvcGvcMiddleware,JwtMiddleware
+)
+
 service kubecc-api {
     @handler GreetHandler
     get /greet/from/:name (Request) returns (Response)

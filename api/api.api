@@ -5,10 +5,10 @@ import (
 )
 
 info (
-	title:   "type title here"
-	desc:    "type desc here"
-	author:  "type author here"
-	email:   "type email here"
-	version: "type version here"
+	title:   "kubecc"
+	desc:    "kubecc"
+	author:  "kubecc"
+	email:   "kubecc@random.com"
+	version: "v1"
 )
 

@@ -1,33 +1,20 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
 	"greet/api/internal/config"
 	"greet/api/internal/handler"
 	"greet/api/internal/svc"
 	"greet/core/nacos"
-
-	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/rest"
-)
-
-var (
-	// todo FIXME: kubecc-api.yaml -> kubecc-nacos.yaml
-	configFile = flag.String("f", "etc/kubecc-api.yaml", "the config file")
 )
 
 func main() {
-	flag.Parse()
-
-	nc := &nacos.Config{}
-
-	conf.MustLoad(*configFile, nc)
-
-	nc.Init()
 
 	c := &config.Config{}
-	if err := conf.LoadFromYamlBytes([]byte(nc.GetCnf()), c); err != nil {
+	nc := nacos.Init()
+	if err := conf.LoadFromYamlBytes([]byte(c.GetCnf(nc)), c); err != nil {
 		panic(err)
 	}
 
@@ -37,8 +24,9 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
-	go c.HotLoadCnf(nc)
+	go c.Register(nc)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+
 	server.Start()
 }
