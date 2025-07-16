@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/threading"
 	"github.com/zeromicro/go-zero/rest"
 	"greet/api/internal/config"
 	"greet/api/internal/handler"
@@ -24,7 +25,9 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
-	go c.Register(nc)
+	threading.GoSafe(func() {
+		c.Register(nc)
+	})
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 
