@@ -6,6 +6,6 @@ type Request struct {
 }
 
 type Response struct {
-	Message  string `json : "message"` // response is auto validated
-	Message1 string `json: "message1"` // response is auto validated
+	Message  string `json :"message"` // response is auto validated
+	Message1 string `json:"message1"` // response is auto validated
 }
