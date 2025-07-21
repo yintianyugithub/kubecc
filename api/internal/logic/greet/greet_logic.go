@@ -27,7 +27,7 @@ func (l *GreetLogic) Greet(req *types.Request) (resp *types.Response, err error)
 	// todo: add your logic here and delete this line
 
 	return &types.Response{
-		Message:  "aaa",
-		Message1: "bbbb",
+		Message:  l.svcCtx.Config.Secret,
+		Message1: l.svcCtx.Config.Secret,
 	}, nil
 }

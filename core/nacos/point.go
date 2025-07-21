@@ -7,6 +7,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,7 +24,8 @@ type Config struct {
 	IClient naming_client.INamingClient `json:",optional"`
 
 	// 服务配置文件名
-	ApiName string `json:",optional"`
+	ApiName    string `json:",optional"`
+	AddRpcName string `json:",optional"`
 }
 
 var (
@@ -34,6 +36,8 @@ var (
 func Init() *Config {
 
 	once.Do(func() {
+
+		logx.Infof("Initializing Nacos configuration...")
 
 		conf.MustLoad("./core/nacos/config.yaml", &cnf)
 

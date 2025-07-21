@@ -1,7 +1,20 @@
-Name: add.rpc
+Name: adm-rpc
 ListenOn: 0.0.0.0:7080
-Nacos:
-  Hosts: ["127.0.0.1:8848","127.0.0.1:8848"]
-  Key: kubecc-api.api
-  Scheme: http
-Mode: "pro"
+Mode: pro
+DevServer:
+  Enabled: true
+  Host: 0.0.0.0
+  Port: 8080
+  MetricsPath: "/metrics"
+  HealthPath: "/healthz"
+  EnableMetrics: true
+  EnablePprof: false
+
+MysqlDsn: "metain:JuKLsn&CNy2!!AeV@tcp(zqkd-ttzhb.mysql.rds.aliyuncs.com:3306)/metain?charset=utf8mb4&parseTime=True&loc=Local"
+ClickhouseDsn: "tcp://cc-2zegeyb6aq0680aav.clickhouse.ads.aliyuncs.com:3306?username=adscenter&password=Aa123456"
+
+Secret: "zq@adscenter"
+
+RedisAddr: "r-2zebq6no4muflselc2.redis.rds.aliyuncs.com:6379"
+RedisPass: "JVDCbB7ir-eZxba!V7DfYH"
+RedisPrefix: "meta-server"

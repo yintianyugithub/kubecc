@@ -1,12 +1,18 @@
 package middleware
 
-import "net/http"
+import (
+	"greet/api/internal/config"
+	"net/http"
+)
 
 type JwtMiddleware struct {
+	c *config.Config
 }
 
-func NewJwtMiddleware() *JwtMiddleware {
-	return &JwtMiddleware{}
+func NewJwtMiddleware(c *config.Config) *JwtMiddleware {
+	return &JwtMiddleware{
+		c: c,
+	}
 }
 
 func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/core/threading"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -15,22 +15,13 @@ import (
 	"greet/service/add/pb/add"
 )
 
-var (
-	configFile = flag.String("f", "etc/add.yaml", "the config file")
-	nc         = nacos.PointParam{
-		NamespaceId: "b7ed918d-562a-4d15-85d7-d46dd7852262",
-		ServerName:  "add",
-		GroupName:   "api",
-		DataId:      "2",
-	}
-)
-
 func main() {
-	flag.Parse()
-
 	c := &config.Config{}
+	nc := nacos.Init()
 
-	conf.MustLoad(*configFile, c)
+	if err := conf.LoadFromYamlBytes([]byte(c.GetCnf(nc)), &c); err != nil {
+		panic(err)
+	}
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		add.RegisterAdderServer(grpcServer, server.NewAdderServer(svc.NewServiceContext(c)))
@@ -41,6 +32,11 @@ func main() {
 	})
 	defer s.Stop()
 
+	threading.GoSafe(func() {
+		c.Register(nc)
+	})
+
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+
 	s.Start()
 }

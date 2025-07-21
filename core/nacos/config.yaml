@@ -3,3 +3,4 @@ Key: kubecc-api.api
 Scheme: http
 Mode: "pro"
 ApiName: "kubecc-api"
+AddRpcName: "add-rpc"
