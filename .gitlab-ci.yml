@@ -1,0 +1,50 @@
+stages:
+  - build
+
+variables:
+  PROJECT_NAME: kubecc
+  PROJECT_TOKEN: rqGN4eR73nazvAWFZEfD
+  PROJECT_DIR_I18N: rsync://47.251.73.37/code/meta-server
+  I18N_SERVER_IP: 47.251.73.37
+  FS_TOKEN: 7786fde1-ba09-401d-a030-bad8a7108c30
+  FS_SECRET: wSiDQh5h8RUyRZ66rj5qLd
+  GO: /usr/local/go1.22/bin/go
+  PROJECT_DIR: rsync://172.17.24.133/code/website/meta-server
+  TESTIP: 172.17.24.133
+  CI_NOTIFY_URL: http://172.17.24.133:10188/ci/notify?proj_id=${CI_PROJECT_ID}&proj_name=${CI_PROJECT_NAME}&proj_group=${CI_PROJECT_NAMESPACE}&proj_commit=${CI_COMMIT_SHORT_SHA}&proj_token=${PROJECT_TOKEN}&fs_token=${FS_TOKEN}&fs_secret=${FS_SECRET}&proj_job=${CI_JOB_NAME}
+  SAE_BIN: /etc/gitlab-runner/saectl
+  SAE_REGION: us-west-1
+
+prod_api:
+  allow_failure: true
+  stage: build
+  only:
+    - master
+  script:
+    - echo "编译"
+    - $GO mod tidy && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $GO build -o meta-api api/meta.go  && ls -l &&
+    - docker build --build-arg ENV=prod -t registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-api:${CI_JOB_ID} -f ./api/Dockerfile .
+    - docker push registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-api:${CI_JOB_ID}
+    - docker rmi registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-api:${CI_JOB_ID}
+    - /app/3rd/anaconda3/bin/python /etc/gitlab-runner/wayne/wayne.py "meta-api" ${CI_JOB_ID} "deploy" "zqkd"
+    - curl ${CI_NOTIFY_URL}
+  when: manual
+  tags:
+    - docker-new
+
+prod_rpc_adm:
+  allow_failure: true
+  stage: build
+  only:
+    - master
+  script:
+    - echo "编译"
+    - $GO mod tidy && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $GO build -o meta-rpc-adm rpc/adm/adm.go  && ls -l &&
+    - docker build --build-arg ENV=prod -t registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-rpc-adm:${CI_JOB_ID} -f ./rpc/adm/Dockerfile .
+    - docker push registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-rpc-adm:${CI_JOB_ID}
+    - docker rmi registry-vpc.cn-beijing.aliyuncs.com/zqkd/meta-rpc-adm:${CI_JOB_ID}
+    - /app/3rd/anaconda3/bin/python /etc/gitlab-runner/wayne/wayne.py "meta-rpc-adm" ${CI_JOB_ID} "deploy" "zqkd"
+    - curl ${CI_NOTIFY_URL}
+  when: manual
+  tags:
+    - docker-new
